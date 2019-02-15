@@ -2,6 +2,11 @@ from PIL import Image
 import binascii
 
 
+INVALID_FILENAME = '{} could not be opened, check if name is correct.'
+INVALID_MESSAGE_TYPE = 'Message has to be a string!'
+INVALID_IMAGE_MODE = 'Wrong mode of the image!'
+
+
 def string_to_binary(message):
     """
     Convert string text to binary string
@@ -20,16 +25,16 @@ def binary_to_string(binary):
     return binascii.unhexlify('0b{:02x}'.format(int(binary, 2)))[1:] if binary != '' else ''
 
 
-def hide_message(filename, message):
+def encode_message(filename, message):
     """
     Hide text message in the picture. String text is converted into binary code and
     successive bits replace LSB in the blue part of the pixels.
     :param filename: name of image in which the method hide the message
     :param message: string text message which will be hide in picture
-    :return: string message about the success of the method
+    :return: string message 'Completed!' or raise error
     """
     if type(message) != str:
-        raise TypeError('Message has to be string!')
+        raise TypeError(INVALID_MESSAGE_TYPE)
     try:
         with Image.open(filename) as image:
             bin_message = string_to_binary(message) + '11111111111111111110'
@@ -39,11 +44,11 @@ def hide_message(filename, message):
                 image = image.convert('RGB')
                 pixels = image.getdata()
 
-                for pix in pixels:
+                for pixels in pixels:
                     if bin_position < len(bin_message):
-                        blue_part = bin(pix[2])
+                        blue_part = bin(pixels[2])
                         blue_part = blue_part[:-1] + bin_message[bin_position]  # swap pixel
-                        new_pix = (pix[0], pix[1], int(blue_part, 2))
+                        new_pix = (pixels[0], pixels[1], int(blue_part, 2))
                         new_pixels.append(new_pix)
                         bin_position += 1
                     else:
@@ -52,16 +57,17 @@ def hide_message(filename, message):
                 image.putdata(new_pixels)
                 image.save('new_'+filename, 'PNG')
                 return 'Completed!'
-            return 'Wrong mode of picture!'
+            else:
+                raise TypeError(INVALID_IMAGE_MODE)
     except IOError:
-        raise IOError("{} couldn't be opened, check if name is correct.".format(filename))
+        raise IOError(INVALID_FILENAME.format(filename))
 
 
-def read_message(filename):
+def decode_message(filename):
     """
     Decode the message in the image.
     :param filename: name of the image with hidden message
-    :return: if decoding succeeds return string hidden message, else return string with problem
+    :return: if decoding succeeds return string hidden message, else raise error
     """
     try:
         with Image.open(filename) as image:
@@ -69,10 +75,11 @@ def read_message(filename):
             pixels = image.getdata()
             if image.mode in 'RGB':
 
-                for pix in pixels:
-                    bin_message += bin(pix[2])[-1]
+                for pixels in pixels:
+                    bin_message += bin(pixels[2])[-1]
                     if bin_message[-20:] == '11111111111111111110':
                         return binary_to_string(bin_message[:-20])
-            return 'Wrong mode of picture!'
+            else:
+                raise TypeError(INVALID_IMAGE_MODE)
     except IOError:
-        raise IOError("{} couldn't be opened, check if name is correct.".format(filename))
+        raise IOError(INVALID_FILENAME.format(filename))
