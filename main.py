@@ -8,7 +8,7 @@ def string_to_binary(message):
     :param message: string message we want to convert
     :return: string binary message without '0b' on beginning
     """
-    return bin(int(binascii.hexlify(message), 16))[2:]
+    return bin(int(binascii.hexlify(message), 16))[2:] if message != '' else ''
 
 
 def binary_to_string(binary):
@@ -17,7 +17,7 @@ def binary_to_string(binary):
     :param binary: string with binary message WITHOUT '0b' on beginning
     :return: string message
     """
-    return binascii.unhexlify('0b{:02x}'.format(int(binary, 2)))[1:]
+    return binascii.unhexlify('0b{:02x}'.format(int(binary, 2)))[1:] if binary != '' else ''
 
 
 def hide_message(filename, message):
@@ -28,6 +28,8 @@ def hide_message(filename, message):
     :param message: string text message which will be hide in picture
     :return: string message about the success of the method
     """
+    if type(message) != str:
+        return "Message has to string!"
     try:
         with Image.open(filename) as image:
             bin_message = string_to_binary(message) + '11111111111111111110'
