@@ -31,4 +31,5 @@ def test_wrong_picture(decode_file, message, encode_file):
     142, 50.00, pytest, {'a': 123}, ['a', 'b', 'c'], {'a', 'b', '123'}, pytest
 ])
 def test_wrong_message(message):
-    assert main.hide_message('ladybug.bmp', message) == "Message has to string!"
+    with pytest.raises(TypeError):
+        assert main.hide_message('ladybug.bmp', message)

@@ -29,7 +29,7 @@ def hide_message(filename, message):
     :return: string message about the success of the method
     """
     if type(message) != str:
-        return "Message has to string!"
+        raise TypeError('Message has to be string!')
     try:
         with Image.open(filename) as image:
             bin_message = string_to_binary(message) + '11111111111111111110'
@@ -75,4 +75,4 @@ def read_message(filename):
                         return binary_to_string(bin_message[:-20])
             return 'Wrong mode of picture!'
     except IOError:
-        print "{} couldn't be opened, check if name is correct.".format(filename)
+        raise IOError("{} couldn't be opened, check if name is correct.".format(filename))
