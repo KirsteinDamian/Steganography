@@ -1,5 +1,7 @@
-from PIL import Image
+import argparse
 import binascii
+
+from PIL import Image
 
 
 INVALID_FILENAME = '{} could not be opened, check if name is correct.'
@@ -55,7 +57,7 @@ def encode_message(filename, message):
                         break
 
                 image.putdata(new_pixels)
-                image.save('new_'+filename, 'PNG')
+                image.save('new_' + filename, 'PNG')
                 return 'Completed!'
             else:
                 raise TypeError(INVALID_IMAGE_MODE)
@@ -78,8 +80,22 @@ def decode_message(filename):
                 for pixels in pixels:
                     bin_message += bin(pixels[2])[-1]
                     if bin_message[-20:] == '11111111111111111110':
+                        print binary_to_string(bin_message[:-20])
                         return binary_to_string(bin_message[:-20])
             else:
                 raise TypeError(INVALID_IMAGE_MODE)
     except IOError:
         raise IOError(INVALID_FILENAME.format(filename))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-f', '--filename', help='Name of image in which the method hide the message',
+                        type=str, required=True)
+    parser.add_argument('-m', '--message', help='String text message which will be hide in picture',
+                        type=str)
+    args = parser.parse_args()
+    if args.message:
+        encode_message(args.filename, args.message)
+    else:
+        decode_message(args.filename)
