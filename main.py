@@ -80,7 +80,6 @@ def decode_message(filename):
                 for pixels in pixels:
                     bin_message += bin(pixels[2])[-1]
                     if bin_message[-20:] == '11111111111111111110':
-                        print binary_to_string(bin_message[:-20])
                         return binary_to_string(bin_message[:-20])
             else:
                 raise TypeError(INVALID_IMAGE_MODE)
@@ -98,4 +97,4 @@ if __name__ == '__main__':
     if args.message:
         encode_message(args.filename, args.message)
     else:
-        decode_message(args.filename)
+        print decode_message(args.filename)
